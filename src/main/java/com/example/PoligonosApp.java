@@ -25,47 +25,47 @@ public class PoligonosApp extends Application {
      * Assim, cada polígono é formado por uma lista de pontos.
      */
     private final List<List<Point>> pontosPoligonos = List.of(
-        // Quadrilátero (Quadrado)
-        List.of(
-            new Point( 50,  50),
-            new Point(150,  50),
-            new Point(150, 150),
-            new Point( 50, 150)
-        ),
+            // Quadrilátero (Quadrado)
+            List.of(
+                    new Point( 50,  50),
+                    new Point(150,  50),
+                    new Point(150, 150),
+                    new Point( 50, 150)
+            ),
 
-        // Quadrilátero (Retângulo)
-        List.of(
-            new Point(200,  50),
-            new Point(400,  50),
-            new Point(400, 100),
-            new Point(200, 100)
-        ),
+            // Quadrilátero (Retângulo)
+            List.of(
+                    new Point(200,  50),
+                    new Point(400,  50),
+                    new Point(400, 100),
+                    new Point(200, 100)
+            ),
 
-        // Triângulo
-        List.of(
-            new Point(300, 250),
-            new Point(350, 150),
-            new Point(400, 250)
-        ),
+            // Triângulo
+            List.of(
+                    new Point(300, 250),
+                    new Point(350, 150),
+                    new Point(400, 250)
+            ),
 
-        // Pentágono
-        List.of(
-            new Point(200, 250),
-            new Point(250, 300),
-            new Point(250, 350),
-            new Point(150, 350),
-            new Point(150, 300)
-        ),
+            // Pentágono
+            List.of(
+                    new Point(200, 250),
+                    new Point(250, 300),
+                    new Point(250, 350),
+                    new Point(150, 350),
+                    new Point(150, 300)
+            ),
 
-        // Hexágono
-        List.of(
-                new Point(320, 270),
-                new Point(370, 320),
-                new Point(370, 370),
-                new Point(320, 420),
-                new Point(270, 370),
-                new Point(270, 320)
-        )
+            // Hexágono
+            List.of(
+                    new Point(320, 270),
+                    new Point(370, 320),
+                    new Point(370, 370),
+                    new Point(320, 420),
+                    new Point(270, 370),
+                    new Point(270, 320)
+            )
     );
 
     /**
@@ -131,8 +131,23 @@ public class PoligonosApp extends Application {
      * "triângulo", "pentágono", "hexágono" ou apenas um "polígono" geral quando tiver mais de 6 lados.
      */
     protected List<String> tipoPoligonos(){
-        // TODO Apague esta linha e a próxima e implemente seu código
-        return List.of();
+        return pontosPoligonos.stream()
+                .map(List::size)
+                .map(size -> {
+                    switch (size) {
+                        case 3:
+                            return "Triângulo";
+                        case 4:
+                            return "Quadrilátero";
+                        case 5:
+                            return "Pentágono";
+                        case 6:
+                            return "Hexágono";
+                        default:
+                            return "Polígono";
+                    }
+                })
+                .toList();
     }
 
     /**
@@ -176,8 +191,14 @@ public class PoligonosApp extends Application {
      * @return uma lista contendo o perímetro de cada polígono
      */
     protected List<Double> perimetros(){
-        // TODO Apague esta linha e a próxima e implemente seu código
-        return List.of();
+        return pontosPoligonos.stream()
+                .map(listaPontos -> {
+                    final var primeiroPonto = listaPontos.get(0);
+                    final var ultimoPonto = listaPontos.get(listaPontos.size() - 1);
+                    return Stream.concat(listaPontos.stream(), Stream.of(primeiroPonto))
+                            .reduce(new Point(ultimoPonto.x(), ultimoPonto.y()), Point::new);
+                })
+                .map(Point::distance)
+                .toList();
     }
 }
-
