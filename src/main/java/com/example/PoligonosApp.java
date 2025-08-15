@@ -1,5 +1,6 @@
 package com.example;
 
+import java.awt.geom.Point2D;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -190,15 +191,43 @@ public class PoligonosApp extends Application {
      *
      * @return uma lista contendo o perímetro de cada polígono
      */
+//    protected List<Double> perimetros(){
+//        return pontosPoligonos.stream()
+//                .map(listaPontos -> {
+//                    final var primeiroPonto = listaPontos.get(0);
+//                    final var ultimoPonto = listaPontos.get(listaPontos.size() - 1);
+//                    return Stream.concat(listaPontos.stream(), Stream.of(primeiroPonto))
+//                            .reduce(new Point(ultimoPonto.x(), ultimoPonto.y()), Point::new);
+//                })
+//                .map(Point::distance)
+//                .toList();
+//    }
+
     protected List<Double> perimetros(){
         return pontosPoligonos.stream()
-                .map(listaPontos -> {
+                .flatMap(listaPontos -> {
+                    // Checa se a lista tem menos de 2 pontos (n forma um poligono)
+                    if (listaPontos.size() < 2) {
+                        return Stream.of(0.0);
+                    }
+
+                    // 1. Obtem o primeiro ponto
                     final var primeiroPonto = listaPontos.get(0);
-                    final var ultimoPonto = listaPontos.get(listaPontos.size() - 1);
-                    return Stream.concat(listaPontos.stream(), Stream.of(primeiroPonto))
-                            .reduce(new Point(ultimoPonto.x(), ultimoPonto.y()), Point::new);
+
+                    // 2. Cria um novo Stream que começa com o primeiro ponto
+                    // mas com a distancia inicial de 0.
+                    final var pontoInicial = new Point(primeiroPonto.x(), primeiroPonto.y(), 0);
+
+                    // 3. Usa o reduce para somar as distancias entre os pontos, começando do segundo ponto.
+                    final var ultimoPontoComPerimetro = listaPontos.stream()
+                            .reduce(pontoInicial, (p1, p2) -> new Point(p1, p2));
+
+                    // 4. Calcula a distancia de fechamento do polígono (ultimo ponto para o primeiro)
+                    // e soma ao perimetro acumulado.
+                    final var perimetroTotal = ultimoPontoComPerimetro.distance() + Point2D.distance(ultimoPontoComPerimetro.x(), ultimoPontoComPerimetro.y(), primeiroPonto.x(), primeiroPonto.y());
+
+                    return Stream.of(perimetroTotal);
                 })
-                .map(Point::distance)
                 .toList();
     }
 }
